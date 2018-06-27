@@ -130,6 +130,7 @@ function installPhpIfMissing() {
 	if [[ "${phpInstalled}" == "false" ]]; then
 		echo "PHP not installed... will install 7.2 version"
 		# LAME
+		export LANG=C.UTF-8
 		"${APT_BIN}" install python-software-properties -y
 		"${ADD_APT_BIN}" ppa:ondrej/php -y
 		"${APT_BIN}" update -y && "${APT_BIN}" install -y php7.2
