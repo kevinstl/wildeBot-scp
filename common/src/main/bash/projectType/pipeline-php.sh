@@ -45,6 +45,10 @@ function downloadAppBinary() {
 	mkdir -p "$(outputFolder)/sources"
 	if [[ "${success}" == "true" ]]; then
 		echo "File downloaded successfully!"
+
+		#TODO: ensure that tar is installed
+		"${APT_BIN}" install tar -y
+
 		"${TAR_BIN}" -cvf "${destination}" "$(outputFolder)/sources"
 		echo "File unpacked successfully"
 		return 0
