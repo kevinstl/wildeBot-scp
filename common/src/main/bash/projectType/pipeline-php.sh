@@ -73,7 +73,7 @@ function retrieveAppName() {
 	local tmpDir
 	tmpDir="$( mktemp -d )"
 	trap "{ rm -rf \$tmpDir; }" EXIT
-	("${COMPOSER_BIN}" app-name) > "${tmpDir}/command" && cat "${tmpDir}/command" | tail -1
+	("${COMPOSER_BIN}" app-name) > "${tmpDir}/command" 2>&1 && cat "${tmpDir}/command" | tail -1
 }
 
 # ---- TEST PHASE ----
