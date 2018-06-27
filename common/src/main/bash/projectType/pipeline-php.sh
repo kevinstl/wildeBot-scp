@@ -29,7 +29,15 @@ function build() {
 	local tarSubLocation
 	tarSubLocation="${changedGroupId}/$(retrieveAppName)/${artifactName}"
 	echo "Uploading the tar to ["${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}"]"
-	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X POST "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}" --data "${artifactLocation}"
+	local success="false"
+	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X POST "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}" --data "${artifactLocation}" --fail && success="true"
+	if [[ "${success}" == "true" ]]; then
+		echo "File uploaded successfully!"
+		return 0
+	else
+		echo "Failed to upload file!"
+		return 1
+	fi
 }
 
 function downloadAppBinary() {
