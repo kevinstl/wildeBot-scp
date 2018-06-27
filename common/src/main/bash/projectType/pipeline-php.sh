@@ -7,8 +7,8 @@ COMPOSER_BIN="${COMPOSER_BIN:-composer}"
 PHP_BIN="${PHP_BIN:-php}"
 APT_BIN="${APT_BIN:-apt-get}"
 ADD_APT_BIN="${ADD_APT_BIN:-add-apt-repository}"
-TAR_BIN="${TAR_BIN:tar}"
-CURL_BIN="${CURL_BIN:tar}"
+TAR_BIN="${TAR_BIN:-tar}"
+CURL_BIN="${CURL_BIN:-curl}"
 BINARY_EXTENSION="${BINARY_EXTENSION:-tar.gz}"
 
 # ---- BUILD PHASE ----
@@ -19,10 +19,6 @@ function build() {
 	local artifactName
 	artifactName="$(retrieveAppName)-${PIPELINE_VERSION}.${BINARY_EXTENSION}"
 	artifactLocation="$(outputFolder)/${artifactName}"
-
-	#TODO: ensure that tar is installed
-	"${APT_BIN}" install tar -y
-
 	"${TAR_BIN}" -czvf "${artifactLocation}"
 	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X POST "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${artifactName}" --data "${artifactLocation}"
 }
@@ -45,10 +41,6 @@ function downloadAppBinary() {
 	mkdir -p "$(outputFolder)/sources"
 	if [[ "${success}" == "true" ]]; then
 		echo "File downloaded successfully!"
-
-		#TODO: ensure that tar is installed
-		"${APT_BIN}" install tar -y
-
 		"${TAR_BIN}" -cvf "${destination}" "$(outputFolder)/sources"
 		echo "File unpacked successfully"
 		return 0
