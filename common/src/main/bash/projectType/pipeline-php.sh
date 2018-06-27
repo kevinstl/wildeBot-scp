@@ -22,8 +22,14 @@ function build() {
 	tmpDir="$( mktemp -d )"
 	trap "{ rm -rf \$tmpDir; }" EXIT
 	artifactLocation="${tmpDir}/${artifactName}"
-	"${TAR_BIN}" -czvf "${artifactLocation}" *
-	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X POST "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${artifactName}" --data "${artifactLocation}"
+	echo "Packaging the sources to ${artifactLocation}"
+	"${TAR_BIN}" -czf "${artifactLocation}" *
+	local changedGroupId
+	changedGroupId="$(echo "$(retrieveGroupId)" | tr . /)"
+	local tarSubLocation
+	tarSubLocation="${changedGroupId}/${artifactName}"
+	echo "Uploading the tar to ["${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}"]"
+	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X POST "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}" --data "${artifactLocation}"
 }
 
 function downloadAppBinary() {
