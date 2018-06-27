@@ -6,6 +6,7 @@ export COMPOSER_BIN PHP_BIN
 COMPOSER_BIN="${COMPOSER_BIN:-composer}"
 PHP_BIN="${PHP_BIN:-php}"
 APT_BIN="${APT_BIN:-apt-get}"
+ADD_APT_BIN="${ADD_APT_BIN:-add-apt-repository}"
 TAR_BIN="${TAR_BIN:tar}"
 CURL_BIN="${CURL_BIN:tar}"
 BINARY_EXTENSION="${BINARY_EXTENSION:-tar.gz}"
@@ -129,6 +130,8 @@ function installPhpIfMissing() {
 	if [[ "${phpInstalled}" == "false" ]]; then
 		echo "PHP not installed... will install 7.2 version"
 		# LAME
-		"${APT_BIN}" update && "${APT_BIN}" install -y php7.2
+		"${APT_BIN}" install python-software-properties -y
+		"${ADD_APT_BIN}" ppa:ondrej/php -y
+		"${APT_BIN}" update -y && "${APT_BIN}" install -y php7.2
 	fi
 }
