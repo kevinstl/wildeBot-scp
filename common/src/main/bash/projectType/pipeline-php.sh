@@ -110,6 +110,7 @@ function downloadComposerIfMissing() {
 	local composerInstalled
 	"${COMPOSER_BIN}" --version && composerInstalled="true" || composerInstalled="false"
 	if [[ "${composerInstalled}" == "false" ]]; then
+		echo "Composer not installed... will install the latest"
 		mkdir -p "$( outputFolder )"
 		pushd "$( outputFolder )"
 			"${PHP_BIN}" -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
@@ -126,7 +127,8 @@ function installPhpIfMissing() {
 	local phpInstalled
 	"${PHP_BIN}" --version && phpInstalled="true" || phpInstalled="false"
 	if [[ "${phpInstalled}" == "false" ]]; then
+		echo "PHP not installed... will install 7.2 version"
 		# LAME
-		"${APT_BIN}" update && "${APT_BIN}" install -y php7.0
+		"${APT_BIN}" update && "${APT_BIN}" install -y php7.2
 	fi
 }
