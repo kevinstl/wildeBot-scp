@@ -19,7 +19,7 @@ function build() {
 	local artifactName
 	artifactName="$(retrieveAppName)-${PIPELINE_VERSION}.${BINARY_EXTENSION}"
 	artifactLocation="$(outputFolder)/${artifactName}"
-	"${TAR_BIN}" -czvf "${artifactLocation}"
+	"${TAR_BIN}" -czvf "${artifactLocation}" *
 	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X POST "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${artifactName}" --data "${artifactLocation}"
 }
 
