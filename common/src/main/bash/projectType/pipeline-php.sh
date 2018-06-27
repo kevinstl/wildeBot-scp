@@ -69,11 +69,13 @@ function retrieveGroupId() {
 
 # TODO: Add to list of required functions
 function retrieveAppName() {
-	downloadComposerIfMissing
-	local tmpDir
-	tmpDir="$( mktemp -d )"
-	trap "{ rm -rf \$tmpDir; }" EXIT
-	("${COMPOSER_BIN}" app-name) > "${tmpDir}/command" 2>&1 && cat "${tmpDir}/command" | tail -1
+	#downloadComposerIfMissing
+	#local tmpDir
+	#tmpDir="$( mktemp -d )"
+	#trap "{ rm -rf \$tmpDir; }" EXIT
+	#("${COMPOSER_BIN}" app-name) > "${tmpDir}/command" 2>&1 && cat "${tmpDir}/command" | tail -1
+	# TODO: Read it somehow from composer
+	printf '%s\n' "${PWD##*/}"
 }
 
 # ---- TEST PHASE ----
