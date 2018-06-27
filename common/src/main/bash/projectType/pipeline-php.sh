@@ -57,6 +57,7 @@ function pathToPushToCf() {
 export -f pathToPushToCf
 
 function apiCompatibilityCheck() {
+	downloadComposerIfMissing
 	"${COMPOSER_BIN}" test-apicompatibility
 }
 
@@ -67,6 +68,7 @@ function retrieveGroupId() {
 
 # TODO: Add to list of required functions
 function retrieveAppName() {
+	downloadComposerIfMissing
 	local tmpDir
 	tmpDir="$( mktemp -d )"
 	trap "{ rm -rf \$tmpDir; }" EXIT
@@ -76,12 +78,14 @@ function retrieveAppName() {
 # ---- TEST PHASE ----
 
 function runSmokeTests() {
+	downloadComposerIfMissing
 	"${COMPOSER_BIN}" test-smoke
 }
 
 # ---- STAGE PHASE ----
 
 function runE2eTests() {
+	downloadComposerIfMissing
 	"${COMPOSER_BIN}" test-e2e
 }
 
