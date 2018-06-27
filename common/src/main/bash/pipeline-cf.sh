@@ -240,8 +240,14 @@ function deployAppNoStart() {
 		instances=1
 	fi
 	echo "Deploying app with name [${lowerCaseAppName}], env [${env}] and host [${hostname}] with manifest file [${pathToManifest}]"
-	"${CF_BIN}" push "${lowerCaseAppName}" -f "${pathToManifest}" -p "${OUTPUT_FOLDER}/${artifactName}.${BINARY_EXTENSION}" -n "${hostname}" -i "${instances}" --no-start
+	"${CF_BIN}" push "${lowerCaseAppName}" -f "${pathToManifest}" -p "$( pathToPushToCf )" -n "${hostname}" -i "${instances}" --no-start
 	setEnvVar "${lowerCaseAppName}" 'APP_BINARY' "${artifactName}.${BINARY_EXTENSION}"
+}
+
+# TODO: Describe that this can be overridable
+function pathToPushToCf() {
+	local artifactName="${1}"
+	echo "${OUTPUT_FOLDER}/${artifactName}.${BINARY_EXTENSION}"
 }
 
 function hostname() {
