@@ -127,6 +127,6 @@ function installPhpIfMissing() {
 	"${PHP_BIN}" --version && phpInstalled="true" || phpInstalled="false"
 	if [[ "${phpInstalled}" == "false" ]]; then
 		# LAME
-		"${APT_BIN}" update && "${APT_BIN}" install -y php7
+		"${APT_BIN}" update && "${APT_BIN}" install -y php7.0
 	fi
 }
