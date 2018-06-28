@@ -17,18 +17,20 @@ function build() {
 	"${COMPOSER_BIN}" install
 	local artifactLocation
 	local artifactName
-	artifactName="$(retrieveAppName)-${PIPELINE_VERSION}.${BINARY_EXTENSION}"
+	local appName
+	appName="$(retrieveAppName)"
+	artifactName="${appName}-${PIPELINE_VERSION}.${BINARY_EXTENSION}"
 	local tmpDir
 	tmpDir="$( mktemp -d )"
 	trap "{ rm -rf \$tmpDir; }" EXIT
 	artifactLocation="${tmpDir}/${artifactName}"
-	echo "Packaging the sources to ${artifactLocation}"
+	echo "Packaging the sources to [${artifactLocation}]"
 	"${TAR_BIN}" -czf "${artifactLocation}" ./*
 	local changedGroupId
 	# shellcheck disable=SC2005
 	changedGroupId="$(echo "$(retrieveGroupId)" | tr . /)"
 	local tarSubLocation
-	tarSubLocation="${changedGroupId}/$(retrieveAppName)/${artifactName}"
+	tarSubLocation="${changedGroupId}/${appName}/${artifactName}"
 	echo "Uploading the tar to [${REPO_WITH_BINARIES_FOR_UPLOAD}/${tarSubLocation}]"
 	local success="false"
 	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X PUT "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}" --data "${artifactLocation}" --fail && success="true"
@@ -85,7 +87,7 @@ function apiCompatibilityCheck() {
 # TODO: Add to list of required functions
 function retrieveGroupId() {
 	downloadComposerIfMissing
-	"${COMPOSER_BIN}" group-id 2>/dev/null
+	"${COMPOSER_BIN}" group-id 2>/dev/null | tail -1
 }
 
 # TODO: Add to list of required functions
@@ -94,7 +96,7 @@ function retrieveAppName() {
 		echo "${PROJECT_NAME}"
 	fi
 	downloadComposerIfMissing
-	"${COMPOSER_BIN}" app-name 2>/dev/null
+	"${COMPOSER_BIN}" app-name 2>/dev/null | tail -1
 }
 
 # ---- TEST PHASE ----
