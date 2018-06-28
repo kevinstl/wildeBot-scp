@@ -139,13 +139,13 @@ function downloadComposerIfMissing() {
 	"${COMPOSER_BIN}" --version > /dev/null 2>&1 && composerInstalled="true" || composerInstalled="false"
 	if [[ "${composerInstalled}" == "false" ]]; then
 		mkdir -p "$( outputFolder )"
-		pushd "$( outputFolder )"
+		pushd "$( outputFolder )"  > /dev/null 2>&1
 			"${PHP_BIN}" -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"  > /dev/null 2>&1
 			"${PHP_BIN}" -r "if (hash_file('SHA384', 'composer-setup.php') === '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"  > /dev/null 2>&1
 			"${PHP_BIN}" composer-setup.php  > /dev/null 2>&1
 			"${PHP_BIN}" -r "unlink('composer-setup.php');"  > /dev/null 2>&1
 			COMPOSER_BIN="$( pwd )/composer.phar"
-		popd
+		popd  > /dev/null 2>&1
 	fi
 }
 
