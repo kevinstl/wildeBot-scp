@@ -342,6 +342,9 @@ LANGUAGE_TYPE_FROM_DESCRIPTOR="$( getLanguageType )"
 DEFAULT_LANGUAGE_TYPE="${LANGUAGE_TYPE_FROM_DESCRIPTOR:-jvm}"
 export LANGUAGE_TYPE
 LANGUAGE_TYPE="$( toLowerCase "${LANGUAGE_TYPE:-${DEFAULT_LANGUAGE_TYPE}}" )"
+export SOURCE_ARTIFACT_TYPE="source"
+export BINARY_ARTIFACT_TYPE="binary"
+export ARTIFACT_TYPE
 __DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 [[ -f "${__DIR}/projectType/pipeline-${LANGUAGE_TYPE}.sh" ]] && source "${__DIR}/projectType/pipeline-${LANGUAGE_TYPE}.sh" ||  \

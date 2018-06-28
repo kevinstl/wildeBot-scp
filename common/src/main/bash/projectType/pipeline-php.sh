@@ -62,7 +62,7 @@ function downloadAppBinary() {
 	local success="false"
 	curl -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" "${pathToArtifact}" -o "${destination}" --fail && success="true"
 	local outputDir
-	outputDir="${OUTPUT_FOLDER}/sources"
+	outputDir="${OUTPUT_FOLDER}/${SOURCE_ARTIFACT_TYPE}"
 	mkdir -p "${outputDir}"
 	if [[ "${success}" == "true" ]]; then
 		echo "File downloaded successfully!"

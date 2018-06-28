@@ -712,6 +712,3 @@ function waitForServicesToInitialize() {
 
 export CF_BIN
 CF_BIN="${CF_BIN:-cf}"
-SOURCE_ARTIFACT_TYPE="source"
-BINARY_ARTIFACT_TYPE="binary"
-export ARTIFACT_TYPE
