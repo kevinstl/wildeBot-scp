@@ -136,14 +136,14 @@ function testResultsAntPattern() {
 function downloadComposerIfMissing() {
 	installPhpIfMissing
 	local composerInstalled
-	"${COMPOSER_BIN}" --version > /dev/null && composerInstalled="true" || composerInstalled="false"
+	"${COMPOSER_BIN}" --version > /dev/null 2>&1 && composerInstalled="true" || composerInstalled="false"
 	if [[ "${composerInstalled}" == "false" ]]; then
 		mkdir -p "$( outputFolder )"
 		pushd "$( outputFolder )"
-			"${PHP_BIN}" -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"  > /dev/null
-			"${PHP_BIN}" -r "if (hash_file('SHA384', 'composer-setup.php') === '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"  > /dev/null
-			"${PHP_BIN}" composer-setup.php  > /dev/null
-			"${PHP_BIN}" -r "unlink('composer-setup.php');"  > /dev/null
+			"${PHP_BIN}" -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"  > /dev/null 2>&1
+			"${PHP_BIN}" -r "if (hash_file('SHA384', 'composer-setup.php') === '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"  > /dev/null 2>&1
+			"${PHP_BIN}" composer-setup.php  > /dev/null 2>&1
+			"${PHP_BIN}" -r "unlink('composer-setup.php');"  > /dev/null 2>&1
 			COMPOSER_BIN="$( pwd )/composer.phar"
 		popd
 	fi
@@ -151,13 +151,13 @@ function downloadComposerIfMissing() {
 
 function installPhpIfMissing() {
 	local phpInstalled
-	"${PHP_BIN}" --version > /dev/null && phpInstalled="true" || phpInstalled="false"
+	"${PHP_BIN}" --version > /dev/null 2>&1 && phpInstalled="true" || phpInstalled="false"
 	if [[ "${phpInstalled}" == "false" ]]; then
 		# LAME
 		export LANG=C.UTF-8
-		"${APT_BIN}" -y install python-software-properties  > /dev/null
-		"${ADD_APT_BIN}" -y ppa:ondrej/php  > /dev/null
-		"${APT_BIN}" -y update && "${APT_BIN}" -y install php7.2  > /dev/null
-		"${APT_BIN}" -y install php-pear php7.2-curl php7.2-dev php7.2-gd php7.2-mbstring php7.2-zip php7.2-mysql php7.2-xml  > /dev/null
+		"${APT_BIN}" -y install python-software-properties  > /dev/null 2>&1
+		"${ADD_APT_BIN}" -y ppa:ondrej/php  > /dev/null 2>&1
+		"${APT_BIN}" -y update && "${APT_BIN}" -y install php7.2  > /dev/null 2>&1
+		"${APT_BIN}" -y install php-pear php7.2-curl php7.2-dev php7.2-gd php7.2-mbstring php7.2-zip php7.2-mysql php7.2-xml  > /dev/null 2>&1
 	fi
 }
