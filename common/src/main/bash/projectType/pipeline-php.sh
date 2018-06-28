@@ -92,7 +92,11 @@ function retrieveAppName() {
 	#trap "{ rm -rf \$tmpDir; }" EXIT
 	#("${COMPOSER_BIN}" app-name) > "${tmpDir}/command" 2>&1 && cat "${tmpDir}/command" | tail -1
 	# TODO: Read it somehow from composer
+	if [[ "${PROJECT_NAME}" != "" ]];
+	echo "${PROJECT_NAME}"
+	else
 	printf '%s\n' "${PWD##*/}"
+	fi
 }
 
 # ---- TEST PHASE ----
