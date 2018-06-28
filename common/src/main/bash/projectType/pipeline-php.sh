@@ -19,7 +19,9 @@ function build() {
 	local artifactName
 	local appName
 	appName="$(retrieveAppName)"
+	echo "App name retrieved from the project [${appName}]"
 	artifactName="${appName}-${PIPELINE_VERSION}.${BINARY_EXTENSION}"
+	echo "Artifact name will be [${artifactName}]"
 	local tmpDir
 	tmpDir="$( mktemp -d )"
 	trap "{ rm -rf \$tmpDir; }" EXIT
@@ -94,9 +96,10 @@ function retrieveGroupId() {
 function retrieveAppName() {
 	if [[ "${PROJECT_NAME}" != "" && "${PROJECT_NAME}" != "${DEFAULT_PROJECT_NAME}" ]]; then
 		echo "${PROJECT_NAME}"
+	else
+		downloadComposerIfMissing
+		"${COMPOSER_BIN}" app-name 2>/dev/null | tail -1
 	fi
-	downloadComposerIfMissing
-	"${COMPOSER_BIN}" app-name 2>/dev/null | tail -1
 }
 
 # ---- TEST PHASE ----
