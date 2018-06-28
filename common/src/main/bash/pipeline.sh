@@ -20,6 +20,17 @@ function apiCompatibilityCheck() {
 	exit 1
 }
 
+function retrieveGroupId() {
+	echo "Echos the namespace that corresponds to the given application. In the
+	JVM world corresponds to a group id of a project"
+	exit 1
+}
+
+function retrieveAppName() {
+	echo "Echos the name of the application"
+	exit 1
+}
+
 # ---- TEST PHASE ----
 
 function testDeploy() {
@@ -327,23 +338,6 @@ else
 	fi
 fi
 
-# Project name can be taken from env variable or from the project's app name
-# We need it to tag the project somehow if the PROJECT_NAME var wasn't passed
-if [[ "${PROJECT_NAME}" == "" || "${PROJECT_NAME}" == "null" ]]; then
-	if [ -n "$(type -t retrieveAppName)" ] && [ "$(type -t retrieveAppName)" = function ]; then
-		PROJECT_NAME="$(retrieveAppName)"
-	else
-		echo "[retrieveAppName] function not defined. Will derive project name from the current folder"
-		PROJECT_NAME="${DEFAULT_PROJECT_NAME}"
-	fi
-fi
-
-echo "Project with name [${PROJECT_NAME}] is setup as [${PROJECT_SETUP}]. The project directory is present at [${ROOT_PROJECT_DIR}]"
-
-# shellcheck source=/dev/null
-[[ -f "${__ROOT}/pipeline-${PAAS_TYPE}.sh" ]] && source "${__ROOT}/pipeline-${PAAS_TYPE}.sh" ||  \
- echo "No pipeline-${PAAS_TYPE}.sh found"
-
 LANGUAGE_TYPE_FROM_DESCRIPTOR="$( getLanguageType )"
 DEFAULT_LANGUAGE_TYPE="${LANGUAGE_TYPE_FROM_DESCRIPTOR:-jvm}"
 export LANGUAGE_TYPE
@@ -352,6 +346,19 @@ __DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 [[ -f "${__DIR}/projectType/pipeline-${LANGUAGE_TYPE}.sh" ]] && source "${__DIR}/projectType/pipeline-${LANGUAGE_TYPE}.sh" ||  \
  echo "No projectType/pipeline-${LANGUAGE_TYPE}.sh found"
+echo "Language type [${LANGUAGE_TYPE}]"
+
+# Project name can be taken from env variable or from the project's app name
+# We need it to tag the project somehow if the PROJECT_NAME var wasn't passed
+if [[ "${PROJECT_NAME}" == "" || "${PROJECT_NAME}" == "null" ]]; then
+	PROJECT_NAME="$(retrieveAppName)"
+fi
+
+echo "Project with name [${PROJECT_NAME}] is setup as [${PROJECT_SETUP}]. The project directory is present at [${ROOT_PROJECT_DIR}]"
+
+# shellcheck source=/dev/null
+[[ -f "${__ROOT}/pipeline-${PAAS_TYPE}.sh" ]] && source "${__ROOT}/pipeline-${PAAS_TYPE}.sh" ||  \
+ echo "No pipeline-${PAAS_TYPE}.sh found"
 
 export CUSTOM_SCRIPT_IDENTIFIER="${CUSTOM_SCRIPT_IDENTIFIER:-custom}"
 echo "Custom script identifier is [${CUSTOM_SCRIPT_IDENTIFIER}]"

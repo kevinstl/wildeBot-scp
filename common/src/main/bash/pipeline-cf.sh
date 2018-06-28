@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -e
+set -e
 
 function logInToPaas() {
 	local user="PAAS_${ENVIRONMENT}_USERNAME"
@@ -223,6 +223,16 @@ function deployAppNoStart() {
 	local env="${3}"
 	local pathToManifest="${4}"
 	local hostNameSuffix="${5}"
+	# we need to change directory to source if necessary
+	local artifactType
+	artifactType="$( getArtifactType )"
+	echo "Project has artifact type [${artifactType}]"
+	if [[ "${artifactType}" == "${SOURCE_ARTIFACT_TYPE}" ]]; then
+		local dir
+		dir="$(pathToUnpackedSources)"
+		mkdir -p "${dir}"
+		pushd "${dir}"
+	fi
 	if [[ -z "${pathToManifest}" || "${pathToManifest}" == "null" ]]; then
 		pathToManifest="manifest.yml"
 	fi
@@ -242,12 +252,43 @@ function deployAppNoStart() {
 	echo "Deploying app with name [${lowerCaseAppName}], env [${env}] and host [${hostname}] with manifest file [${pathToManifest}]"
 	"${CF_BIN}" push "${lowerCaseAppName}" -f "${pathToManifest}" -p "$( pathToPushToCf "${artifactName}" )" -n "${hostname}" -i "${instances}" --no-start
 	setEnvVar "${lowerCaseAppName}" 'APP_BINARY' "${artifactName}.${BINARY_EXTENSION}"
+	if [[ "${artifactType}" == "${SOURCE_ARTIFACT_TYPE}" ]]; then
+		popd
+	fi
 }
 
-# TODO: Describe that this can be overridable
+# Gets the type of artifact that should be pushed to CF. [binary] or [source]?
+function getArtifactType() {
+	if [[ "${ARTIFACT_TYPE}" != "" ]]; then
+		echo "${ARTIFACT_TYPE}"
+	elif [[ ! -z "${PARSED_YAML}" ]]; then
+		local artifactType
+		artifactType="$( echo "${PARSED_YAML}" | jq -r '.artifact_type' )"
+		if [[ "${artifactType}" == "null" ]]; then
+			artifactType="${BINARY_ARTIFACT_TYPE}"
+		fi
+		toLowerCase "${artifactType}"
+	else
+		echo "${BINARY_ARTIFACT_TYPE}"
+	fi
+}
+
 function pathToPushToCf() {
 	local artifactName="${1}"
-	echo "${OUTPUT_FOLDER}/${artifactName}.${BINARY_EXTENSION}"
+	local artifactType
+	artifactType="$( getArtifactType )"
+	if [[ "${artifactType}" == "${BINARY_ARTIFACT_TYPE}" ]]; then
+		echo "${OUTPUT_FOLDER}/${artifactName}.${BINARY_EXTENSION}"
+	elif [[ "${artifactType}" == "${SOURCE_ARTIFACT_TYPE}" ]]; then
+		echo "."
+	else
+		echo "Unknown artifact type"
+		return 1
+	fi
+}
+
+function pathToUnpackedSources() {
+	echo "${OUTPUT_FOLDER}/source"
 }
 
 function hostname() {
@@ -667,3 +708,6 @@ function waitForServicesToInitialize() {
 
 export CF_BIN
 CF_BIN="${CF_BIN:-cf}"
+SOURCE_ARTIFACT_TYPE="source"
+BINARY_ARTIFACT_TYPE="binary"
+export ARTIFACT_TYPE

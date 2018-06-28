@@ -65,7 +65,7 @@ function curl {
 	# App
 	assert_output --partial "composer install"
 	assert_output --partial "tar -czf"
-	assert_output --partial "curl -u foo:bar -X PUT http://foo/com/example/my-project/1.0.0.M8/my-project-1.0.0.M8.tar.gz --data"
+	assert_output --partial "curl -u foo:bar -X PUT http://foo/com/example/my-project/1.0.0.M8/my-project-1.0.0.M8.tar.gz --upload-file"
 	# We don't want exception on jq parsing
 	refute_output --partial "Cannot iterate over null (null)"
 	assert_success

@@ -8,8 +8,10 @@ setup() {
 	export TEMP_DIR="$( mktemp -d )"
 	export ENVIRONMENT="test"
 	export PAAS_TYPE="dummy"
+	export PROJECT_TYPE="dummy"
 
 	ln -s "${FIXTURES_DIR}/pipeline-dummy.sh" "${SOURCE_DIR}"
+	ln -s "${FIXTURES_DIR}/pipeline-dummy.sh" "${SOURCE_DIR}/projectType"
 	cp -a "${FIXTURES_DIR}/generic" "${TEMP_DIR}"
 	cp -a "${FIXTURES_DIR}/maven" "${TEMP_DIR}/maven"
 	cp -a "${FIXTURES_DIR}/gradle" "${TEMP_DIR}/gradle"
@@ -17,6 +19,7 @@ setup() {
 
 teardown() {
 	rm -f "${SOURCE_DIR}/pipeline-dummy.sh"
+	rm -f "${SOURCE_DIR}/projectType/pipeline-dummy.sh"
 	rm -rf "${TEMP_DIR}"
 }
 
@@ -183,48 +186,6 @@ teardown() {
 	assert_success
 }
 
-@test "should set PROJECT_NAME to 'single_repo_no_descriptor' for SINGLE_REPO project setup and PROJECT_NAME initially set to 'null'" {
-	cd "${TEMP_DIR}/generic/single_repo_no_descriptor"
-	export PROJECT_NAME="null"
-
-	# to get the output
-	run "${SOURCE_DIR}/pipeline.sh"
-	# to get the env vars
-	source "${SOURCE_DIR}/pipeline.sh"
-
-	assert_equal "${PROJECT_SETUP}" "SINGLE_REPO"
-	assert_equal "${PROJECT_NAME}" "single_repo_no_descriptor"
-	assert_success
-}
-
-@test "should set PROJECT_NAME to 'single_repo' when PROJECT_NAME initially set to 'null' for SINGLE_REPO PROJECT_SETUP for a repo with descriptor without coordinates" {
-	cd "${TEMP_DIR}/generic/single_repo"
-	export PROJECT_NAME="null"
-
-	# to get the output
-	run "${SOURCE_DIR}/pipeline.sh"
-	# to get the env vars
-	source "${SOURCE_DIR}/pipeline.sh"
-
-	assert_equal "${PROJECT_SETUP}" "SINGLE_REPO"
-	assert_equal "${PROJECT_NAME}" "single_repo"
-	assert_success
-}
-
-@test "should set PROJECT_NAME to 'multi_module' when PROJECT_NAME initially set to 'null' for MULTI_MODULE PROJECT_SETUP for a repo with descriptor with coordinates" {
-	cd "${TEMP_DIR}/generic/multi_module"
-	export PROJECT_NAME="null"
-
-	# to get the output
-	run "${SOURCE_DIR}/pipeline.sh"
-	# to get the env vars
-	source "${SOURCE_DIR}/pipeline.sh"
-
-	assert_equal "${PROJECT_SETUP}" "MULTI_MODULE"
-	assert_equal "${PROJECT_NAME}" "multi_module"
-	assert_success
-}
-
 @test "should find the latest tag from git project for existant project name" {
 	cd "${TEMP_DIR}/generic/git_project"
 	mv git .git
@@ -357,6 +318,7 @@ teardown() {
 @test "should return custom language type if provided explicitly and language is set in descriptor" {
 	cd "${TEMP_DIR}/generic/php_repo"
 	export LANGUAGE_TYPE=foo
+	export PROJECT_NAME="php"
 
 	# to get the env vars
 	source "${SOURCE_DIR}/pipeline.sh"
@@ -367,6 +329,7 @@ teardown() {
 
 @test "should return language type from descriptor" {
 	cd "${TEMP_DIR}/generic/php_repo"
+	export PROJECT_NAME="php"
 
 	# to get the env vars
 	source "${SOURCE_DIR}/pipeline.sh"
@@ -377,6 +340,7 @@ teardown() {
 
 @test "should not break when deploy services is called and there are no services" {
 	cd "${TEMP_DIR}/generic/php_repo"
+	export PROJECT_NAME="php"
 	# to get the env vars
 	source "${SOURCE_DIR}/pipeline.sh"
 
@@ -387,6 +351,7 @@ teardown() {
 
 @test "should fail if there is no environment node present" {
 	cd "${TEMP_DIR}/generic/php_repo"
+	export PROJECT_NAME="php"
 	# to get the env vars
 	source "${SOURCE_DIR}/pipeline.sh"
 
@@ -397,6 +362,7 @@ teardown() {
 
 @test "should succeed if there is an environment node present" {
 	cd "${TEMP_DIR}/generic/php_repo"
+	export PROJECT_NAME="php"
 	PIPELINE_DESCRIPTOR="${FIXTURES_DIR}/sc-pipelines-generic.yml"
 	# to get the env vars
 	source "${SOURCE_DIR}/pipeline.sh"

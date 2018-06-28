@@ -34,9 +34,12 @@ setup() {
 	export PAAS_PROD_API_URL="prod-api"
 
 	cp -a "${FIXTURES_DIR}/gradle" "${FIXTURES_DIR}/maven" "${FIXTURES_DIR}/generic" "${TEMP_DIR}"
+	ln -s "${FIXTURES_DIR}/pipeline-dummy.sh" "${SOURCE_DIR}"
+	ln -s "${FIXTURES_DIR}/pipeline-dummy.sh" "${SOURCE_DIR}/projectType/"
 }
 
 teardown() {
+	rm -f "${SOURCE_DIR}/projectType/pipeline-dummy.sh"
 	rm -f "${SOURCE_DIR}/pipeline-dummy.sh"
 	rm -rf "${TEMP_DIR}"
 }
@@ -183,6 +186,7 @@ export -f fakeRetrieveStubRunnerIds
 
 @test "should download cf and connect to cluster [CF]" {
 	export CF_BIN="cf"
+	export LANGUAGE_TYPE="dummy"
 	env="test"
 	cd "${TEMP_DIR}/maven/empty_project"
 	source "${SOURCE_DIR}/pipeline.sh"
@@ -325,8 +329,8 @@ export -f fakeRetrieveStubRunnerIds
 	refute_output --partial "No pipeline descriptor found - will not deploy any services"
 	# App
 	assert_output --partial "curl -u foo:bar http://foo/com/example/my-project/1.0.0.M8/my-project-1.0.0.M8.tar.gz -o ${TEMP_DIR}/generic/php_repo/target/my-project-1.0.0.M8.tar.gz --fail"
-	assert_output --partial "tar -zxf ${TEMP_DIR}/generic/php_repo/target/my-project-1.0.0.M8.tar.gz -C target/sources"
-	assert_output --partial "cf push my-project -f manifest.yml -p target/sources -n my-project-${env} -i 1 --no-start"
+	assert_output --partial "tar -zxf ${TEMP_DIR}/generic/php_repo/target/my-project-1.0.0.M8.tar.gz -C target/source"
+	assert_output --partial "cf push my-project -f manifest.yml -p . -n my-project-test -i 1 --no-start"
 	assert_output --partial "cf set-env my-project SPRING_PROFILES_ACTIVE cloud,smoke,test"
 	assert_output --partial "cf restart my-project"
 	# We don't want exception on jq parsing

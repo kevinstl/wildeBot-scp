@@ -33,7 +33,7 @@ function build() {
 	changedGroupId="$(echo "$(retrieveGroupId)" | tr . /)"
 	local tarSubLocation
 	tarSubLocation="${changedGroupId}/${appName}/${PIPELINE_VERSION}/${artifactName}"
-	tarSize="$(du -k ${artifactLocation} | cut -f 1)"
+	tarSize="$(du -k "${artifactLocation}" | cut -f 1)"
 	echo "Uploading the tar with size [${tarSize}] to [${REPO_WITH_BINARIES_FOR_UPLOAD}/${tarSubLocation}] from [${artifactLocation}]"
 	local success="false"
 	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X PUT "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}" --upload-file "${artifactLocation}" --fail && success="true"
@@ -54,15 +54,15 @@ function downloadAppBinary() {
 	local destination
 	local changedGroupId
 	local pathToArtifact
-	destination="$(pwd)/$(outputFolder)/${artifactId}-${version}.${BINARY_EXTENSION}"
+	destination="$(pwd)/${OUTPUT_FOLDER}/${artifactId}-${version}.${BINARY_EXTENSION}"
 	changedGroupId="$(echo "${groupId}" | tr . /)"
 	pathToArtifact="${repoWithBinaries}/${changedGroupId}/${artifactId}/${version}/${artifactId}-${version}.${BINARY_EXTENSION}"
-	mkdir -p "$(outputFolder)"
+	mkdir -p "${OUTPUT_FOLDER}"
 	echo "Current folder is [$(pwd)]; Downloading binary from [${pathToArtifact}] to [${destination}]"
 	local success="false"
 	curl -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" "${pathToArtifact}" -o "${destination}" --fail && success="true"
 	local outputDir
-	outputDir="$(outputFolder)/sources"
+	outputDir="${OUTPUT_FOLDER}/sources"
 	mkdir -p "${outputDir}"
 	if [[ "${success}" == "true" ]]; then
 		echo "File downloaded successfully!"
@@ -74,13 +74,6 @@ function downloadAppBinary() {
 		return 1
 	fi
 }
-
-function pathToPushToCf() {
-	echo "$(outputFolder)/sources"
-}
-
-# TODO: Describe that we're overriding the pipeline-cf function
-export -f pathToPushToCf
 
 function apiCompatibilityCheck() {
 	downloadComposerIfMissing

@@ -380,6 +380,10 @@ stage:
       plan: standard
 ----
 
+Another CF specific property is `artifact_type`. It can be either `binary` or `source`.
+Certain languages require a binary to get uploaded (e.g. JAVA) but with others
+you have to push the sources (e.g. PHP). The default value is `binary`.
+
 === Project Setup
 
 Spring Cloud Pipelines supports three main types of project setup
