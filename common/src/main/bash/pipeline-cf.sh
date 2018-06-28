@@ -240,7 +240,7 @@ function deployAppNoStart() {
 		instances=1
 	fi
 	echo "Deploying app with name [${lowerCaseAppName}], env [${env}] and host [${hostname}] with manifest file [${pathToManifest}]"
-	"${CF_BIN}" push "${lowerCaseAppName}" -f "${pathToManifest}" -p "$( pathToPushToCf )" -n "${hostname}" -i "${instances}" --no-start
+	"${CF_BIN}" push "${lowerCaseAppName}" -f "${pathToManifest}" -p "$( pathToPushToCf "${artifactName}" )" -n "${hostname}" -i "${instances}" --no-start
 	setEnvVar "${lowerCaseAppName}" 'APP_BINARY' "${artifactName}.${BINARY_EXTENSION}"
 }
 
@@ -627,8 +627,12 @@ function completeSwitchOver() {
 function propagatePropertiesForTests() {
 	local projectArtifactId="${1}"
 	local serviceType="stubrunner"
-	local stubRunnerName
-	stubRunnerName="$(echo "${PARSED_YAML}" |  jq --arg x "${LOWERCASE_ENV}" --arg y "${serviceType}" '.[$x].services[] | select(.name == $y) | .name' | sed 's/^"\(.*\)"$/\1/')"
+	local nodeExists
+	envNodeExists "${LOWERCASE_ENV}" && nodeExists="true" || nodeExists="false"
+	local stubRunnerName=""
+	if [[ "${nodeExists}" == "true" ]]; then
+		stubRunnerName="$(echo "${PARSED_YAML}" |  jq --arg x "${LOWERCASE_ENV}" --arg y "${serviceType}" '.[$x].services[] | select(.name == $y) | .name' | sed 's/^"\(.*\)"$/\1/')"
+	fi
 	local fileLocation="${OUTPUT_FOLDER}/test.properties}"
 	echo "Propagating properties for tests. Project [${projectArtifactId}] stub runner app name [${stubRunnerName}] properties location [${fileLocation}]"
 	# retrieve host of the app / stubrunner

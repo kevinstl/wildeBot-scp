@@ -374,3 +374,34 @@ teardown() {
 	assert_equal "${LANGUAGE_TYPE}" "php"
 	assert_success
 }
+
+@test "should not break when deploy services is called and there are no services" {
+	cd "${TEMP_DIR}/generic/php_repo"
+	# to get the env vars
+	source "${SOURCE_DIR}/pipeline.sh"
+
+	run deployServices
+
+	assert_success
+}
+
+@test "should fail if there is no environment node present" {
+	cd "${TEMP_DIR}/generic/php_repo"
+	# to get the env vars
+	source "${SOURCE_DIR}/pipeline.sh"
+
+	run envNodeExists "test"
+
+	assert_failure
+}
+
+@test "should succeed if there is an environment node present" {
+	cd "${TEMP_DIR}/generic/php_repo"
+	PIPELINE_DESCRIPTOR="${FIXTURES_DIR}/sc-pipelines-generic.yml"
+	# to get the env vars
+	source "${SOURCE_DIR}/pipeline.sh"
+
+	run envNodeExists "test"
+
+	assert_success
+}

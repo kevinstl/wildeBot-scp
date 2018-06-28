@@ -23,12 +23,13 @@ function build() {
 	trap "{ rm -rf \$tmpDir; }" EXIT
 	artifactLocation="${tmpDir}/${artifactName}"
 	echo "Packaging the sources to ${artifactLocation}"
-	"${TAR_BIN}" -czf "${artifactLocation}" *
+	"${TAR_BIN}" -czf "${artifactLocation}" ./*
 	local changedGroupId
+	# shellcheck disable=SC2005
 	changedGroupId="$(echo "$(retrieveGroupId)" | tr . /)"
 	local tarSubLocation
 	tarSubLocation="${changedGroupId}/$(retrieveAppName)/${artifactName}"
-	echo "Uploading the tar to ["${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}"]"
+	echo "Uploading the tar to [${REPO_WITH_BINARIES_FOR_UPLOAD}/${tarSubLocation}]"
 	local success="false"
 	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X PUT "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}" --data "${artifactLocation}" --fail && success="true"
 	if [[ "${success}" == "true" ]]; then
@@ -55,10 +56,12 @@ function downloadAppBinary() {
 	echo "Current folder is [$(pwd)]; Downloading binary to [${destination}]"
 	local success="false"
 	curl -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" "${pathToArtifact}" -o "${destination}" --fail && success="true"
-	mkdir -p "$(outputFolder)/sources"
+	local outputDir
+	outputDir="$(outputFolder)/sources"
+	mkdir -p "${outputDir}"
 	if [[ "${success}" == "true" ]]; then
 		echo "File downloaded successfully!"
-		"${TAR_BIN}" -cvf "${destination}" "$(outputFolder)/sources"
+		"${TAR_BIN}" -zxf "${destination}" -C "${outputDir}"
 		echo "File unpacked successfully"
 		return 0
 	else
@@ -81,22 +84,17 @@ function apiCompatibilityCheck() {
 
 # TODO: Add to list of required functions
 function retrieveGroupId() {
-	echo "com.example"
+	downloadComposerIfMissing
+	"${COMPOSER_BIN}" group-id 2>/dev/null
 }
 
 # TODO: Add to list of required functions
 function retrieveAppName() {
-	#downloadComposerIfMissing
-	#local tmpDir
-	#tmpDir="$( mktemp -d )"
-	#trap "{ rm -rf \$tmpDir; }" EXIT
-	#("${COMPOSER_BIN}" app-name) > "${tmpDir}/command" 2>&1 && cat "${tmpDir}/command" | tail -1
-	# TODO: Read it somehow from composer
-	if [[ "${PROJECT_NAME}" != "" ]]; then
-	echo "${PROJECT_NAME}"
-	else
-	printf '%s\n' "${PWD##*/}"
+	if [[ "${PROJECT_NAME}" != "" && "${PROJECT_NAME}" != "${DEFAULT_PROJECT_NAME}" ]]; then
+		echo "${PROJECT_NAME}"
 	fi
+	downloadComposerIfMissing
+	"${COMPOSER_BIN}" app-name 2>/dev/null
 }
 
 # ---- TEST PHASE ----
@@ -120,7 +118,7 @@ function projectType() {
 }
 
 function outputFolder() {
-	echo "vendor"
+	echo "target"
 }
 
 function testResultsAntPattern() {
@@ -132,7 +130,7 @@ function testResultsAntPattern() {
 function downloadComposerIfMissing() {
 	installPhpIfMissing
 	local composerInstalled
-	"${COMPOSER_BIN}" --version && composerInstalled="true" || composerInstalled="false"
+	"${COMPOSER_BIN}" --version > /dev/null && composerInstalled="true" || composerInstalled="false"
 	if [[ "${composerInstalled}" == "false" ]]; then
 		echo "Composer not installed... will install the latest"
 		mkdir -p "$( outputFolder )"
@@ -149,14 +147,14 @@ function downloadComposerIfMissing() {
 
 function installPhpIfMissing() {
 	local phpInstalled
-	"${PHP_BIN}" --version && phpInstalled="true" || phpInstalled="false"
+	"${PHP_BIN}" --version > /dev/null && phpInstalled="true" || phpInstalled="false"
 	if [[ "${phpInstalled}" == "false" ]]; then
 		echo "PHP not installed... will install 7.2 version"
 		# LAME
 		export LANG=C.UTF-8
-		"${APT_BIN}" install python-software-properties -y
-		"${ADD_APT_BIN}" ppa:ondrej/php -y
-		"${APT_BIN}" update -y && "${APT_BIN}" install -y php7.2
-		"${APT_BIN}" install -y php-pear php7.2-curl php7.2-dev php7.2-gd php7.2-mbstring php7.2-zip php7.2-mysql php7.2-xml
+		"${APT_BIN}" -y install python-software-properties
+		"${ADD_APT_BIN}" -y ppa:ondrej/php
+		"${APT_BIN}" -y update && "${APT_BIN}" -y install php7.2
+		"${APT_BIN}" -y install php-pear php7.2-curl php7.2-dev php7.2-gd php7.2-mbstring php7.2-zip php7.2-mysql php7.2-xml
 	fi
 }

@@ -188,9 +188,17 @@ function deployServices() {
 		return
 	fi
 
+	local nodeExists
+	envNodeExists "${LOWERCASE_ENV}" && nodeExists="true" || nodeExists="false"
+	if [[ "${nodeExists}" == "false" ]]; then
+		echo "No services node present. Will skip deployment of services"
+		return;
+	fi
+
 	while read -r serviceName serviceType useExisting; do
 		local parsedServiceType
 		parsedServiceType=$(toLowerCase "${serviceType}")
+		# shellcheck disable=SC2153
 		if [[ "${ENVIRONMENT}" == "TEST" && "${useExisting}" != "true" ]]; then
 			deleteService "${serviceName}" "${parsedServiceType}"
 			deployService "${serviceName}" "${parsedServiceType}"
@@ -204,6 +212,18 @@ function deployServices() {
 	# retrieve the space separated name and type
 	done <<<"$(echo "${PARSED_YAML}" | \
 				 jq -r --arg x "${LOWERCASE_ENV}" '.[$x].services[] | "\(.name) \(.type) \(.useExisting)"')"
+}
+
+# Returns 0 if services node exists, 1 if it doesn't
+function envNodeExists() {
+	local environment="${1}"
+	local services
+	services="$(echo "${PARSED_YAML}" |  jq -r --arg x "${environment}" '.[$x]')"
+	if [[ "${services}" == "null" || "${services}" == "" ]]; then
+		return 1
+	else
+		return 0
+	fi
 }
 
 # Converts YAML to JSON - uses ruby
@@ -261,6 +281,8 @@ echo "Current environment is [${ENVIRONMENT}]"
 export ROOT_PROJECT_DIR
 export PROJECT_SETUP
 export PROJECT_NAME
+export DEFAULT_PROJECT_NAME
+DEFAULT_PROJECT_NAME="$(basename "$(pwd)")"
 parsePipelineDescriptor
 echo "Project name [${PROJECT_NAME}]"
 # if pipeline descriptor is in the provided folder that means that
@@ -312,7 +334,7 @@ if [[ "${PROJECT_NAME}" == "" || "${PROJECT_NAME}" == "null" ]]; then
 		PROJECT_NAME="$(retrieveAppName)"
 	else
 		echo "[retrieveAppName] function not defined. Will derive project name from the current folder"
-		PROJECT_NAME="$(basename "$(pwd)")"
+		PROJECT_NAME="${DEFAULT_PROJECT_NAME}"
 	fi
 fi
 
