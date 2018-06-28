@@ -32,7 +32,7 @@ function build() {
 	# shellcheck disable=SC2005
 	changedGroupId="$(echo "$(retrieveGroupId)" | tr . /)"
 	local tarSubLocation
-	tarSubLocation="${changedGroupId}/${appName}/${artifactName}"
+	tarSubLocation="${changedGroupId}/${appName}/${PIPELINE_VERSION}/${artifactName}"
 	echo "Uploading the tar to [${REPO_WITH_BINARIES_FOR_UPLOAD}/${tarSubLocation}]"
 	local success="false"
 	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X PUT "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}" --data "${artifactLocation}" --fail && success="true"
@@ -57,7 +57,7 @@ function downloadAppBinary() {
 	changedGroupId="$(echo "${groupId}" | tr . /)"
 	pathToArtifact="${repoWithBinaries}/${changedGroupId}/${artifactId}/${version}/${artifactId}-${version}.${BINARY_EXTENSION}"
 	mkdir -p "$(outputFolder)"
-	echo "Current folder is [$(pwd)]; Downloading binary to [${destination}]"
+	echo "Current folder is [$(pwd)]; Downloading binary from [${pathToArtifact}] to [${destination}]"
 	local success="false"
 	curl -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" "${pathToArtifact}" -o "${destination}" --fail && success="true"
 	local outputDir
