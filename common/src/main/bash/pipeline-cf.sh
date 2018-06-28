@@ -265,7 +265,11 @@ function getArtifactType() {
 		local artifactType
 		artifactType="$( echo "${PARSED_YAML}" | jq -r '.artifact_type' )"
 		if [[ "${artifactType}" == "null" ]]; then
-			artifactType="${BINARY_ARTIFACT_TYPE}"
+			if [[ "${LANGUAGE_TYPE}" == "php" ]]; then
+				artifactType="${SOURCE_ARTIFACT_TYPE}"
+			else
+				artifactType="${BINARY_ARTIFACT_TYPE}"
+			fi
 		fi
 		toLowerCase "${artifactType}"
 	else
