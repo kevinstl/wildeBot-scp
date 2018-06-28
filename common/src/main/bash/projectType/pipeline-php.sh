@@ -30,7 +30,7 @@ function build() {
 	tarSubLocation="${changedGroupId}/$(retrieveAppName)/${artifactName}"
 	echo "Uploading the tar to ["${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}"]"
 	local success="false"
-	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X POST "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}" --data "${artifactLocation}" --fail && success="true"
+	"${CURL_BIN}" -u "${M2_SETTINGS_REPO_USERNAME}:${M2_SETTINGS_REPO_PASSWORD}" -X PUT "${REPO_WITH_BINARIES_FOR_UPLOAD}"/"${tarSubLocation}" --data "${artifactLocation}" --fail && success="true"
 	if [[ "${success}" == "true" ]]; then
 		echo "File uploaded successfully!"
 		return 0
