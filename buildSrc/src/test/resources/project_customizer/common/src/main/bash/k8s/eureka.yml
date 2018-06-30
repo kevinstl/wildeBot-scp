@@ -11,7 +11,8 @@ spec:
       spec:
         containers:
         - name: {{appName}}
-          image: {{eurekaImg}}
+#          image: {{eurekaImg}}
+          image: scpipelines/github-eureka:latest
           ports:
           - containerPort: 8761
           env:
