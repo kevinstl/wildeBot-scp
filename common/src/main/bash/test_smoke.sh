@@ -14,6 +14,12 @@ export ENVIRONMENT=TEST
 cd ${WORKSPACE}/scripts
 ./markserv-install.sh skipInitMinikube
 
+echo "debug1"
+pwd
+
 cd ${WORKSPACE}
+
+echo "debug2"
+pwd
 
 runSmokeTests
