@@ -313,6 +313,7 @@ parsedRepos.each {
 		steps {
 			shell(downloadTools(fullGitRepo))
 			shell('''#!/bin/bash
+		${WORKSPACE}/scripts/markserv-install.sh skipInitMinikube
 		${WORKSPACE}/.git/tools/common/src/main/bash/test_smoke.sh
 		''')
 		}
