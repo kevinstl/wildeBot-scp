@@ -72,7 +72,7 @@ function testDeploy() {
 	deployServices
 
 	# deploy app
-	deployAndRestartAppWithNameForSmokeTests "${appName}" "${PIPELINE_VERSION}"
+#	deployAndRestartAppWithNameForSmokeTests "${appName}" "${PIPELINE_VERSION}"
 }
 
 function testRollbackDeploy() {
