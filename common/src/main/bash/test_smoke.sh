@@ -11,5 +11,6 @@ export ENVIRONMENT=TEST
  echo "No pipeline.sh found"
 
 #prepareForSmokeTests
-${WORKSPACE}/scripts/markserv-install.sh skipInitMinikube
+cd ${WORKSPACE}/scripts
+./markserv-install.sh skipInitMinikube
 runSmokeTests
