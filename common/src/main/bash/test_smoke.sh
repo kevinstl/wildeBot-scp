@@ -10,5 +10,5 @@ export ENVIRONMENT=TEST
 [[ -f "${__DIR}/pipeline.sh" ]] && source "${__DIR}/pipeline.sh" ||  \
  echo "No pipeline.sh found"
 
-prepareForSmokeTests
+#prepareForSmokeTests
 runSmokeTests

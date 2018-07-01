@@ -18,6 +18,6 @@ if [[ -z "${prodTag}" || "${prodTag}" == "master" ]]; then
 	echo "No prod release took place - skipping this step"
 else
 	"${GIT_BIN}" checkout "${prodTag}"
-	prepareForSmokeTests
+#	prepareForSmokeTests
 	runSmokeTests
 fi
