@@ -11,7 +11,8 @@ spec:
       spec:
         containers:
         - name: {{appName}}
-          image: {{stubrunnerImg}}
+#          image: {{stubrunnerImg}}
+          image: scpipelines/github-analytics-stub-runner-boot-classpath-stubs:latest
           ports:
           - containerPort: 8050
           env:

@@ -20,7 +20,8 @@ fi
 
 POTENTIAL_DOCKER_HOST="$( echo "$DOCKER_HOST" | cut -d ":" -f 2 | cut -d "/" -f 3 )"
 if [[ -z "${POTENTIAL_DOCKER_HOST}" ]]; then
-    POTENTIAL_DOCKER_HOST="localhost"
+#    POTENTIAL_DOCKER_HOST="localhost"
+    POTENTIAL_DOCKER_HOST="minikube:30011"
 fi
 
 ARTIFACTORY_URL="${ARTIFACTORY_URL:-http://admin:password@${POTENTIAL_DOCKER_HOST}:8081/artifactory/libs-release-local}"
