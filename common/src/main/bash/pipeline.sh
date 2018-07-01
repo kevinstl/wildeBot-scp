@@ -184,7 +184,8 @@ function deployServices() {
 	# shellcheck disable=SC2119
 	parsePipelineDescriptor
 
-	if [[ -z "${PARSED_YAML}" ]]; then
+#	if [[ -z "${PARSED_YAML}" ]]; then
+	if [[ ( -z "${PARSED_YAML}" ) || ( "${PARSED_YAML}" != *"Services"* ) ]]; then
 		return
 	fi
 
